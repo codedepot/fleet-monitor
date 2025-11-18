@@ -1,0 +1,10 @@
+services:
+  fleet-monitor:
+    container_name: fleet-monitor  
+    build: .
+    ports:
+      - "6733:6733"
+    volumes:
+      - .:/app
+    environment:
+      - HOST=0.0.0.0
