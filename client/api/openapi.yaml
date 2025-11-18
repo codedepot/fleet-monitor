@@ -1,0 +1,199 @@
+openapi: 3.0.3
+info:
+  contact:
+    email: support@example.com
+    name: API Support
+    url: http://www.example.com/support
+  description: Simple and correct implementation of the Fleet Management Metrics Coding
+    Assessment
+  license:
+    name: None
+    url: https://safely-you.com
+  title: Fleet Management Simple Metrics Server
+  version: 1.0.0
+servers:
+- description: local server
+  url: http://127.0.0.1:6733/api/v1
+paths:
+  /devices/{device_id}/heartbeat:
+    post:
+      description: Register a heartbeat from a device
+      parameters:
+      - description: ID of a device to register heartbeat with
+        explode: false
+        in: path
+        name: device_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HeartbeatRequest"
+      responses:
+        "204":
+          description: the request was completed successfully
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundResponse"
+          description: Device not found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Server Error
+  /devices/{device_id}/stats:
+    get:
+      description: Return device stats
+      parameters:
+      - description: ID of a device to register heartbeat with
+        explode: false
+        in: path
+        name: device_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetDeviceStatsResponse"
+          description: Device statistics
+        "204":
+          description: the request was completed successfully
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundResponse"
+          description: Device not found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Server Error
+    post:
+      description: Add per device statistics
+      parameters:
+      - description: ID of a device to register heartbeat with
+        explode: false
+        in: path
+        name: device_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadStatsRequest"
+      responses:
+        "204":
+          description: the request was completed successfully
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundResponse"
+          description: Device not found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Server Error
+components:
+  parameters:
+    DeviceIDPathParam:
+      description: ID of a device to register heartbeat with
+      explode: false
+      in: path
+      name: device_id
+      required: true
+      schema:
+        type: string
+      style: simple
+  responses:
+    NotFound:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/NotFoundResponse"
+      description: Device not found
+    Error:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+      description: Server Error
+  schemas:
+    UploadStatsRequest:
+      example:
+        sent_at: 2000-01-23T04:56:07.000+00:00
+        upload_time: 0
+      properties:
+        sent_at:
+          format: date-time
+          type: string
+        upload_time:
+          description: the number of nanoseconds it took to upload a video
+          type: integer
+      required:
+      - sent_at
+      - upload_time
+      title: UploadStatsRequest
+    GetDeviceStatsResponse:
+      example:
+        avg_upload_time: avg_upload_time
+        uptime: 0.8008281904610115
+      properties:
+        avg_upload_time:
+          description: "returned as a time duration string. Eg: 5m10s"
+          type: string
+        uptime:
+          description: "Uptime as a percentage. eg: 98.999"
+          format: double
+          type: number
+      required:
+      - avg_upload_time
+      - uptime
+      title: GetDeviceStatsResponse
+    HeartbeatRequest:
+      example:
+        sent_at: 2000-01-23T04:56:07.000+00:00
+      properties:
+        sent_at:
+          format: date-time
+          type: string
+      required:
+      - sent_at
+      title: HeartbeatRequest
+    NotFoundResponse:
+      example:
+        msg: msg
+      properties:
+        msg:
+          type: string
+      required:
+      - msg
+      title: NotFoundResponse
+      type: object
+    ErrorResponse:
+      example:
+        msg: msg
+      properties:
+        msg:
+          type: string
+      required:
+      - msg
+      title: ErrorResponse
+      type: object
